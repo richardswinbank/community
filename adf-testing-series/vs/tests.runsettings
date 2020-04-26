@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<RunSettings>
+    <TestRunParameters>
+        <Parameter name="KeyVaultUrl" value="https://firefive-adftest95-kv.vault.azure.net" />
+        <Parameter name="DataFactoryResourceGroup" value="firefive-adftest95-rg" />
+        <Parameter name="DataFactoryName" value="firefive-adftest95-adf" />
+    </TestRunParameters>
+</RunSettings>
