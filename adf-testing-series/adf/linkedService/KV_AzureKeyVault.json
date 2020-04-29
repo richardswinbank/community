@@ -1,0 +1,11 @@
+{
+	"name": "KV_AzureKeyVault",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://firefive-adftest95-kv.vault.azure.net/"
+		},
+		"annotations": []
+	}
+}

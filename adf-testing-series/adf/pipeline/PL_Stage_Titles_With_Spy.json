@@ -1,0 +1,215 @@
+{
+	"name": "PL_Stage_Titles_With_Spy",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy src_Titles to stg_Titles",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set RunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE stg.Titles",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_ASQL_Parameterised",
+						"type": "DatasetReference",
+						"parameters": {
+							"ConnectionStringSecretName": {
+								"value": "@pipeline().parameters._SrcConnectionSecretName",
+								"type": "Expression"
+							},
+							"TableSchema": {
+								"value": "@pipeline().parameters._SrcTableSchema",
+								"type": "Expression"
+							},
+							"TableName": {
+								"value": "@pipeline().parameters._SrcTableName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ASQL_AdfTesting",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableSchema": "stg",
+							"TableName": "Titles"
+						}
+					}
+				]
+			},
+			{
+				"name": "Log pipeline start",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": {
+							"value": "@pipeline().parameters._LogStartSpName",
+							"type": "Expression"
+						},
+						"storedProcedureParameters": {
+							"pipelineName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DS_ASQL_AdfTesting",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableSchema": "stg",
+							"TableName": "Authors"
+						}
+					}
+				}
+			},
+			{
+				"name": "Set RunId",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Log pipeline start",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@string(activity('Log pipeline start').output.firstRow.RunId)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Log pipeline end",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Copy src_Titles to stg_Titles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": {
+						"value": "@pipeline().parameters._LogEndSpName",
+						"type": "Expression"
+					},
+					"storedProcedureParameters": {
+						"rowsCopied": {
+							"value": {
+								"value": "@activity('Copy src_Titles to stg_Titles').output.rowsCopied",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"runId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_ASQL_AdfTesting",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"_SrcConnectionSecretName": {
+				"type": "string",
+				"defaultValue": "ExternalSystemDbConnectionString"
+			},
+			"_SrcTableSchema": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"_SrcTableName": {
+				"type": "string",
+				"defaultValue": "Titles"
+			},
+			"_LogStartSpName": {
+				"type": "string",
+				"defaultValue": "[dbo].[LogPipelineStart]"
+			},
+			"_LogEndSpName": {
+				"type": "string",
+				"defaultValue": "[dbo].[LogPipelineEnd]"
+			}
+		},
+		"variables": {
+			"RunId": {
+				"type": "String",
+				"defaultValue": "-1"
+			}
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
