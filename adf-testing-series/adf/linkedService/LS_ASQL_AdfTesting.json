@@ -1,0 +1,18 @@
+{
+	"name": "LS_ASQL_AdfTesting",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "KV_AzureKeyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "AdfTestingDbConnectionString"
+			}
+		},
+		"annotations": []
+	}
+}

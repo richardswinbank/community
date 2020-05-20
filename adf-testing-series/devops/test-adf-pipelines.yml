@@ -1,0 +1,65 @@
+name: $(BuildDefinitionName).$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include: 
+      - adf-testing-series/adf/*
+      - adf-testing-series/vs/03-FunctionalTesting/tests/AdfTests/*
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- task: AzurePowerShell@4
+  displayName: Publish ADF resources
+  inputs:
+    azureSubscription: $(PipelineServiceConnection)
+    azurePowerShellVersion: latestVersion
+    ScriptPath: adf-testing-series\adf\publish.ps1
+    ScriptArguments: -resourceGroupName 'firefive-adftest95-rg' -dataFactoryName 'firefive-adftest95-adf' -adfFileRoot '$(System.DefaultWorkingDirectory)\adf-testing-series\adf' 
+
+- task: NuGetCommand@2
+  displayName: Restore NuGet packages
+  inputs:
+    command: restore
+    feedsToUse: 'select'
+    restoreSolution: 'adf-testing-series\vs\03-FunctionalTesting\tests\AdfTests\AdfTests.csproj'
+
+- task: VSBuild@1
+  displayName: 'Build testing project'
+  inputs:
+    solution: 'adf-testing-series\vs\03-FunctionalTesting\tests\AdfTests\AdfTests.csproj'
+    configuration: 'Debug'
+    clean: true
+
+- task: AzureCLI@2
+  displayName: 'Set pipeline identity variables'
+  inputs:
+    azureSubscription: '$(PipelineServiceConnection)'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    addSpnToEnvironment: true
+    inlineScript: |
+      Write-Host "##vso[task.setvariable variable=AzureTenantId;issecret=true]$env:tenantId"
+      Write-Host "##vso[task.setvariable variable=AzureSubscriptionId;issecret=true]$(az account show --query 'id' --output tsv)"
+      Write-Host "##vso[task.setvariable variable=AzureClientId;issecret=true]$env:servicePrincipalId"
+      Write-Host "##vso[task.setvariable variable=AzureClientSecret;issecret=true]$env:servicePrincipalKey"
+
+- task: VSTest@2
+  displayName: 'Run tests'
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\AdfTests.dll
+    searchFolder: 'adf-testing-series\vs\03-FunctionalTesting\tests\AdfTests\bin\Debug'
+    testRunTitle: 'AdfTestRun'
+    runSettingsFile: 'adf-testing-series\vs\tests.runsettings'
+  env:
+    AZURE_TENANT_ID: $(AzureTenantId)
+    AZURE_SUBSCRIPTION_ID: $(AzureSubscriptionId)
+    AZURE_CLIENT_ID: $(AzureClientId)
+    AZURE_CLIENT_SECRET: $(AzureClientSecret)
