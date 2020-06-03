@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdfTesting.Helpers
@@ -37,17 +38,17 @@ namespace AdfTesting.Helpers
         public async Task<List<ActivityRun>> GetActivityRuns(string pipelineRunId)
         {
             await InitialiseClient();
-            var activityRuns = new List<ActivityRun>();
-            
+
             var filter = new RunFilterParameters(DateTime.MinValue, DateTime.UtcNow);
-            ActivityRunsQueryResponse arqr;
-            do
+            var arqr = await _adfClient.ActivityRuns.QueryByPipelineRunAsync(_rgName, _adfName, pipelineRunId, filter);
+            var activityRuns = arqr.Value.ToList();
+
+            while (!string.IsNullOrWhiteSpace(arqr.ContinuationToken))
             {
+                filter.ContinuationToken = arqr.ContinuationToken;
                 arqr = await _adfClient.ActivityRuns.QueryByPipelineRunAsync(_rgName, _adfName, pipelineRunId, filter);
                 activityRuns.AddRange(arqr.Value);
-                filter.ContinuationToken = arqr.ContinuationToken;
-
-            } while (arqr.ContinuationToken != null);
+            }
 
             return activityRuns;
         }
