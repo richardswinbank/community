@@ -4,5 +4,6 @@
         <Parameter name="KeyVaultUrl" value="https://firefive-adftest95-kv.vault.azure.net" />
         <Parameter name="DataFactoryResourceGroup" value="firefive-adftest95-rg" />
         <Parameter name="DataFactoryName" value="firefive-adftest95-adf" />
+        <Parameter name="ReportTestCoverage" value="true" />
     </TestRunParameters>
 </RunSettings>
