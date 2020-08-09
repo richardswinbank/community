@@ -1,0 +1,180 @@
+{
+	"name": "Execute Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Start pipeline run",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://management.azure.com/subscriptions/@{pipeline().globalParameters.SubscriptionId}/resourceGroups/@{pipeline().globalParameters.ResourceGroupName}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/pipelines/@{pipeline().parameters.PipelineName}/createRun?api-version=2018-06-01",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": {
+						"value": "@pipeline().parameters.PipelineParametersJson",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			},
+			{
+				"name": "Wait until run completes",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Start pipeline run",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains(variables('CompletionStatusList'),variables('RunStatus'))",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Wait 5 seconds",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 5
+							}
+						},
+						{
+							"name": "Check pipeline run status",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "Wait 5 seconds",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/@{pipeline().globalParameters.SubscriptionId}/resourceGroups/@{pipeline().globalParameters.ResourceGroupName}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/pipelineruns/@{activity('Start pipeline run').output.runId}?api-version=2018-06-01",
+									"type": "Expression"
+								},
+								"method": "GET",
+								"body": {
+									"value": "@pipeline().parameters.PipelineParametersJson",
+									"type": "Expression"
+								},
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com/"
+								}
+							}
+						},
+						{
+							"name": "Update RunStatus",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Check pipeline run status",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "RunStatus",
+								"value": {
+									"value": "@activity('Check pipeline run status').output.status",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "7.00:00:00"
+				}
+			},
+			{
+				"name": "Force error if pipeline failed",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Wait until run completes",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('RunStatus'),'Failed')",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Set variable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "RunStatus",
+								"value": {
+									"value": "@string(int('not an int'))",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"PipelineName": {
+				"type": "string"
+			},
+			"PipelineParametersJson": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"RunStatus": {
+				"type": "String",
+				"defaultValue": "Not started"
+			},
+			"CompletionStatusList": {
+				"type": "Array",
+				"defaultValue": [
+					"Succeeded",
+					"Failed",
+					"Cancelled"
+				]
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-08-08T20:04:18Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,28 @@
+{
+	"name": "TestFail",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set MyVar",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "MyVar",
+					"value": {
+						"value": "@string(int('Error!'))",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"MyVar": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-08-08T20:13:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

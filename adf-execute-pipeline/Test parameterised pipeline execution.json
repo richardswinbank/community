@@ -1,0 +1,41 @@
+{
+	"name": "Test parameterised pipeline execution",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute TestWait",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Execute Pipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": "TestWait",
+						"PipelineParametersJson": "{\"WaitTime\":20}"
+					}
+				}
+			},
+			{
+				"name": "Execute TestFail",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Execute Pipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PipelineName": "TestFail"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
