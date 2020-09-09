@@ -1,0 +1,177 @@
+{
+	"type": "TabularTranslator",
+	"mappings": [
+		{
+			"source": {
+				"path": "['dimensions'][0]"
+			},
+			"sink": {
+				"name": "Dimension0",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][1]"
+			},
+			"sink": {
+				"name": "Dimension1",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][2]"
+			},
+			"sink": {
+				"name": "Dimension2",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][3]"
+			},
+			"sink": {
+				"name": "Dimension3",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][4]"
+			},
+			"sink": {
+				"name": "Dimension4",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][5]"
+			},
+			"sink": {
+				"name": "Dimension5",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][6]"
+			},
+			"sink": {
+				"name": "Dimension6",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][7]"
+			},
+			"sink": {
+				"name": "Dimension7",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['dimensions'][8]"
+			},
+			"sink": {
+				"name": "Dimension8",
+				"type": "String"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][0]"
+			},
+			"sink": {
+				"name": "Metric0",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][1]"
+			},
+			"sink": {
+				"name": "Metric1",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][2]"
+			},
+			"sink": {
+				"name": "Metric2",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][3]"
+			},
+			"sink": {
+				"name": "Metric3",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][4]"
+			},
+			"sink": {
+				"name": "Metric4",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][5]"
+			},
+			"sink": {
+				"name": "Metric5",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][6]"
+			},
+			"sink": {
+				"name": "Metric6",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][7]"
+			},
+			"sink": {
+				"name": "Metric7",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][8]"
+			},
+			"sink": {
+				"name": "Metric8",
+				"type": "Decimal"
+			}
+		},
+		{
+			"source": {
+				"path": "['metrics'][0]['values'][9]"
+			},
+			"sink": {
+				"name": "Metric9",
+				"type": "Decimal"
+			}
+		}
+	],
+	"collectionReference": "$['reports'][0]['data']['rows']"
+}
