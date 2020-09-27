@@ -19,4 +19,5 @@ CREATE TABLE dbo.GoogleAnalytics (
 , Metric7 DECIMAL(19,5)     NULL
 , Metric8 DECIMAL(19,5)     NULL
 , Metric9 DECIMAL(19,5)     NULL
+, NextPageToken INT NULL
 )

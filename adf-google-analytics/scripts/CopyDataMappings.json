@@ -171,6 +171,15 @@
 				"name": "Metric9",
 				"type": "Decimal"
 			}
+		},
+		{
+			"source": {
+				"path": "$['reports'][0]['nextPageToken']"
+			},
+			"sink": {
+				"name": "NextPageToken",
+				"type": "Int"
+			}
 		}
 	],
 	"collectionReference": "$['reports'][0]['data']['rows']"
