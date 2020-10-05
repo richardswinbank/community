@@ -1,0 +1,12 @@
+{
+	"name": "GoogleAnalytics",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://analyticsreporting.googleapis.com",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

@@ -1,0 +1,165 @@
+{
+	"name": "GoogleAnalyticsExtractPaged",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get OAuth token",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"functionName": "GetOAuthToken",
+					"method": "GET"
+				},
+				"linkedServiceName": {
+					"referenceName": "MyAzureFunctionApp",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Until no more pages",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Get OAuth token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('NextPageToken'),'-1')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy GA data",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "POST",
+									"requestBody": {
+										"value": "{\n  \"reportRequests\": [\n    {\n      \"viewId\": \"226439645\",\n      \"dateRanges\": [\n        {\"startDate\": \"2020-09-03\", \"endDate\": \"2020-09-03\"}\n      ],\n      \"metrics\": [\n        {\"expression\": \"ga:sessions\"}, {\"expression\": \"ga:sessionDuration\"},\n        {\"expression\": \"ga:bounces\"}, {\"expression\": \"ga:pageviews\"}\n      ],\n      \"dimensions\": [\n        {\"name\": \"ga:source\"}, {\"name\": \"ga:medium\"},\n        {\"name\": \"ga:hasSocialSourceReferral\"}, {\"name\": \"ga:adDistributionNetwork\"}\n      ],\n      \"pageSize\":4\n      @{if(equals(variables('NextPageToken'),'-1'),'',concat(',\"pageToken\":\"',variables('NextPageToken'),'\"'))}\n    }\n  ]\n}",
+										"type": "Expression"
+									},
+									"additionalHeaders": {
+										"Authorization": {
+											"value": "Bearer @{activity('Get OAuth token').output.token}",
+											"type": "Expression"
+										},
+										"Content-Type": "application/json"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink"
+								},
+								"enableStaging": false,
+								"translator": {
+									"value": "@json(variables('CopyDataMapping'))",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "REST_GoogleAnalyticsReports",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ASQL_dbo_GoogleAnalytics",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Get NextPageToken",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Copy GA data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "SELECT COALESCE(MAX(NextPageToken), -1)  AS NextPageToken\nFROM dbo.GoogleAnalytics\n\nUPDATE dbo.GoogleAnalytics SET NextPageToken = NULL",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ASQL_dbo_GoogleAnalytics",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Set NextPageToken",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get NextPageToken",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "NextPageToken",
+								"value": {
+									"value": "@string(activity('Get NextPageToken').output.firstRow.NextPageToken)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "7.00:00:00"
+				}
+			}
+		],
+		"variables": {
+			"CopyDataMapping": {
+				"type": "String",
+				"defaultValue": "{ \t\"type\": \"TabularTranslator\", \t\"mappings\": [ \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][0]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension0\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][1]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension1\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][2]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension2\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][3]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension3\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][4]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension4\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][5]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension5\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][6]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension6\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][7]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension7\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['dimensions'][8]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Dimension8\", \t\t\t\t\"type\": \"String\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][0]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric0\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][1]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric1\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][2]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric2\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][3]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric3\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][4]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric4\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][5]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric5\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][6]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric6\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][7]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric7\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][8]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric8\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"['metrics'][0]['values'][9]\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"Metric9\", \t\t\t\t\"type\": \"Decimal\" \t\t\t} \t\t}, \t\t{ \t\t\t\"source\": { \t\t\t\t\"path\": \"$['reports'][0]['nextPageToken']\" \t\t\t}, \t\t\t\"sink\": { \t\t\t\t\"name\": \"NextPageToken\", \t\t\t\t\"type\": \"Int\" \t\t\t} \t\t} \t], \t\"collectionReference\": \"$['reports'][0]['data']['rows']\" }"
+			},
+			"NextPageToken": {
+				"type": "String",
+				"defaultValue": "-1"
+			}
+		},
+		"annotations": []
+	}
+}
