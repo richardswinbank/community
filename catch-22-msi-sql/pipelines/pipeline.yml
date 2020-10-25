@@ -3,6 +3,7 @@ name: $(BuildDefinitionName).$(Build.BuildId)
 trigger: none
 
 variables:
+  Environment: Catch22-$(Build.BuildId)
   WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql
 
 pool:
@@ -16,3 +17,21 @@ steps:
       command: init
       workingDirectory: $(WorkingDirectory)/terraform
       
+  - task: TerraformCLI@0
+    displayName: Create Terraform plan
+    inputs:
+      command: plan
+      workingDirectory: $(WorkingDirectory)/terraform
+      environmentServiceName: $(PipelineServiceConnection)
+      commandOptions: -out=tf.plan
+    env:
+      TF_VAR_environment_name: $(Environment)
+      TF_VAR_sql_admin_pwd: $(SqlAdminPassword)
+
+  - task: TerraformCLI@0
+    displayName: Terraform environment
+    inputs:
+      command: apply
+      workingDirectory: $(WorkingDirectory)/terraform
+      environmentServiceName: $(PipelineServiceConnection)
+      commandOptions: tf.plan
