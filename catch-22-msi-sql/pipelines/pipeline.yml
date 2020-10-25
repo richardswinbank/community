@@ -37,14 +37,18 @@ steps:
       environmentServiceName: $(PipelineServiceConnection)
       commandOptions: tf.plan
 
+  - script: |
+      echo $TF_OUT_sql_server_name
+      echo $TF_OUT_data_factory_name
+
   - task: SqlAzureDacpacDeployment@1
     displayName: Grant SQL access to Data Factory MSI
     inputs:
       azureSubscription: $(PipelineServiceConnection)
       authenticationType: aadAuthenticationIntegrated
-      serverName: $(TF_OUT_SqlServerName)
+      serverName: $(TF_OUT_sql_server_name)
       databaseName: $(DatabaseName)
       deployType: InlineSqlTask
       sqlInline: |
-        CREATE USER [$(TF_OUT_DataFactoryName)] FROM EXTERNAL PROVIDER
-        ALTER ROLE [db_owner] ADD MEMBER [$(TF_OUT_DataFactoryName)]
+        CREATE USER [$(TF_OUT_data_factory_name)] FROM EXTERNAL PROVIDER
+        ALTER ROLE [db_owner] ADD MEMBER [$(TF_OUT_data_factory_name)]
