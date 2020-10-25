@@ -58,7 +58,7 @@ steps:
     inputs:
       azureSubscription: $(PipelineServiceConnection)
       authenticationType: aadAuthenticationIntegrated
-      serverName: $(TF_OUT_sql_server_name)
+      serverName: $(TF_OUT_sql_server_name).database.windows.net
       databaseName: $(DatabaseName)
       deployType: InlineSqlTask
       sqlInline: |
