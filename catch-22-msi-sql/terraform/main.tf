@@ -32,17 +32,12 @@ resource "azurerm_sql_firewall_rule" "azure_fw_rule" {
 }
 
 resource "azurerm_sql_database" "db" {
-  name                = "ExampleDb"
+  name                = var.database_name
   resource_group_name = azurerm_sql_server.sql.resource_group_name
   location            = azurerm_sql_server.sql.location
   server_name         = azurerm_sql_server.sql.name
   edition             = "Basic"
   tags                = var.tags
-}
-
-output "db_connection_string" {
-  value = "Server=tcp:${azurerm_sql_server.sql.name},1433;Initial Catalog=ExampleDb;User ID=sqladmin;Password=${azurerm_sql_server.sql.administrator_login_password};"
-  sensitive = true  
 }
 
 resource "azurerm_data_factory" "adf" {
@@ -54,6 +49,10 @@ resource "azurerm_data_factory" "adf" {
   identity {
     type = "SystemAssigned"
   }
+}
+
+output "sql_server_name" {
+  value = azurerm_sql_server.sql.name
 }
 
 output "data_factory_name" {
