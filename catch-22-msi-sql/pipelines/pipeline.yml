@@ -4,10 +4,11 @@ trigger: none
 
 variables:
   Environment: catch22-$(Build.BuildId)
-  WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql
+  DatabaseName: ExampleDb
+  WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql    
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-2019'
 
 steps:
 
@@ -26,6 +27,7 @@ steps:
       commandOptions: -out=tf.plan
     env:
       TF_VAR_environment_name: $(Environment)
+      TF_VAR_database_name: $(DatabaseName)
 
   - task: TerraformCLI@0
     displayName: Terraform environment
@@ -34,3 +36,15 @@ steps:
       workingDirectory: $(WorkingDirectory)/terraform
       environmentServiceName: $(PipelineServiceConnection)
       commandOptions: tf.plan
+
+  - task: SqlAzureDacpacDeployment@1
+    displayName: Grant SQL access to Data Factory MSI
+    inputs:
+      azureSubscription: $(PipelineServiceConnection)
+      authenticationType: aadAuthenticationIntegrated
+      serverName: $(TF_OUT_SqlServerName)
+      databaseName: $(DatabaseName)
+      deployType: InlineSqlTask
+      sqlInline: |
+        CREATE USER [$(TF_OUT_DataFactoryName)] FROM EXTERNAL PROVIDER
+        ALTER ROLE [db_owner] ADD MEMBER [$(TF_OUT_DataFactoryName)]
