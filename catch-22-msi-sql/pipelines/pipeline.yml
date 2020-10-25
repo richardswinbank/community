@@ -3,7 +3,7 @@ name: $(BuildDefinitionName).$(Build.BuildId)
 trigger: none
 
 variables:
-  Environment: Catch22-$(Build.BuildId)
+  Environment: catch22-$(Build.BuildId)
   WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql
 
 pool:
