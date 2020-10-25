@@ -49,10 +49,6 @@ steps:
       workingDirectory: $(WorkingDirectory)/terraform
       environmentServiceName: $(PipelineServiceConnection)
 
-  - powershell: |
-      Write-Host $(TF_OUT_sql_server_name)
-      Write-Host $(TF_OUT_data_factory_name)
-
   # this won't work, btw :)
   - task: SqlAzureDacpacDeployment@1
     displayName: Grant SQL access to Data Factory MSI
