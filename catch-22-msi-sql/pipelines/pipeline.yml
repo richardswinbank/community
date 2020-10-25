@@ -1,0 +1,18 @@
+name: $(BuildDefinitionName).$(Build.BuildId)
+
+trigger: none
+
+variables:
+  WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+  - task: TerraformCLI@0
+    displayName: Initialise Terraform
+    inputs:
+      command: init
+      workingDirectory: $(WorkingDirectory)/terraform
+      
