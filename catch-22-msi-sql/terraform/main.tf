@@ -3,12 +3,6 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.environment_name}-rg"
-  location = var.resource_location
-  tags = var.tags
-}
-
 resource "random_password" "sql_admin_pwd" {
   length = 50
 }
@@ -41,6 +35,12 @@ resource "azurerm_data_factory" "adf" {
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.environment_name}-rg"
+  location = var.resource_location
+  tags = var.tags
 }
 
 resource "azurerm_sql_firewall_rule" "azure_fw_rule" {
