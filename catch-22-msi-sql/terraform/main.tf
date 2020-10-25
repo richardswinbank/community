@@ -23,14 +23,6 @@ resource "azurerm_sql_server" "sql" {
   tags = var.tags
 }
 
-resource "azurerm_sql_firewall_rule" "azure_fw_rule" {
-  name                = "AzureServices"
-  resource_group_name = azurerm_sql_server.sql.resource_group_name
-  server_name         = azurerm_sql_server.sql.name
-  start_ip_address    = "0.0.0.0"  # = 'Allow access to Azure services'
-  end_ip_address      = "0.0.0.0"
-}
-
 resource "azurerm_sql_database" "db" {
   name                = var.database_name
   resource_group_name = azurerm_sql_server.sql.resource_group_name
@@ -49,6 +41,14 @@ resource "azurerm_data_factory" "adf" {
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_sql_firewall_rule" "azure_fw_rule" {
+  name                = "AzureServices"
+  resource_group_name = azurerm_sql_server.sql.resource_group_name
+  server_name         = azurerm_sql_server.sql.name
+  start_ip_address    = "0.0.0.0"  # = 'Allow access to Azure services'
+  end_ip_address      = "0.0.0.0"
 }
 
 output "sql_server_name" {
