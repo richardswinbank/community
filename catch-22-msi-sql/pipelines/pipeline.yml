@@ -5,7 +5,7 @@ trigger: none
 variables:
   Environment: catch22-$(Build.BuildId)
   DatabaseName: ExampleDb
-  WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql    
+  WorkingDirectory: $(System.DefaultWorkingDirectory)/catch-22-msi-sql
 
 pool:
   vmImage: 'windows-2019'
