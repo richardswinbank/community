@@ -1,6 +1,6 @@
 # Get metadata recursively
 
-The code in this folder accompanies my blog posts about getting metadata recursively in Azure Data Factory.
+The code in this folder accompanies my [blog posts](https://richardswinbank.net/adf/get_more_metadata) about getting metadata recursively in Azure Data Factory.
 
 * `Path` contains the example file tree 
 * `vs` contains the Azure Function definition
