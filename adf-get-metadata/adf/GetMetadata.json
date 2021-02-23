@@ -1,0 +1,293 @@
+{
+    "name": "GetMetadata",
+    "properties": {
+        "activities": [
+            {
+                "name": "Initialise queue",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "Queue",
+                    "value": {
+                        "value": "@json(concat('[{\"type\":\"Path\",\"name\":\"',pipeline().parameters.RootPath,'\"}]'))",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Until queue is empty",
+                "type": "Until",
+                "dependsOn": [
+                    {
+                        "activity": "Initialise queue",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(length(variables('Queue')),0)",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "Process queue head",
+                            "type": "Switch",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "on": {
+                                    "value": "@variables('Queue')[0].type",
+                                    "type": "Expression"
+                                },
+                                "cases": [
+                                    {
+                                        "value": "Folder",
+                                        "activities": [
+                                            {
+                                                "name": "Append folder path",
+                                                "type": "SetVariable",
+                                                "dependsOn": [],
+                                                "userProperties": [],
+                                                "typeProperties": {
+                                                    "variableName": "_tmpQueue",
+                                                    "value": {
+                                                        "value": "@union(variables('Queue'),json(concat('[{\"type\":\"Path\",\"name\":\"',variables('CurrentFolderPath'),'/',variables('Queue')[0].name,'\"}]')))",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "name": "varSwap2",
+                                                "type": "SetVariable",
+                                                "dependsOn": [
+                                                    {
+                                                        "activity": "Append folder path",
+                                                        "dependencyConditions": [
+                                                            "Succeeded"
+                                                        ]
+                                                    }
+                                                ],
+                                                "userProperties": [],
+                                                "typeProperties": {
+                                                    "variableName": "Queue",
+                                                    "value": {
+                                                        "value": "@variables('_tmpQueue')",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "value": "Path",
+                                        "activities": [
+                                            {
+                                                "name": "Get folder contents",
+                                                "type": "GetMetadata",
+                                                "dependsOn": [
+                                                    {
+                                                        "activity": "Set CurrentFolderPath",
+                                                        "dependencyConditions": [
+                                                            "Succeeded"
+                                                        ]
+                                                    }
+                                                ],
+                                                "policy": {
+                                                    "timeout": "7.00:00:00",
+                                                    "retry": 0,
+                                                    "retryIntervalInSeconds": 30,
+                                                    "secureOutput": false,
+                                                    "secureInput": false
+                                                },
+                                                "userProperties": [],
+                                                "typeProperties": {
+                                                    "dataset": {
+                                                        "referenceName": "MyBlobStorageContainer",
+                                                        "type": "DatasetReference",
+                                                        "parameters": {
+                                                            "FolderPath": {
+                                                                "value": "@variables('CurrentFolderPath')",
+                                                                "type": "Expression"
+                                                            }
+                                                        }
+                                                    },
+                                                    "fieldList": [
+                                                        "childItems"
+                                                    ],
+                                                    "storeSettings": {
+                                                        "type": "AzureBlobStorageReadSettings",
+                                                        "recursive": true
+                                                    },
+                                                    "formatSettings": {
+                                                        "type": "BinaryReadSettings"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "name": "Insert into queue",
+                                                "type": "SetVariable",
+                                                "dependsOn": [
+                                                    {
+                                                        "activity": "Get folder contents",
+                                                        "dependencyConditions": [
+                                                            "Succeeded"
+                                                        ]
+                                                    }
+                                                ],
+                                                "userProperties": [],
+                                                "typeProperties": {
+                                                    "variableName": "_tmpQueue",
+                                                    "value": {
+                                                        "value": "@union(take(variables('Queue'),1),activity('Get folder contents').output.childItems,skip(variables('Queue'),1))",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "name": "varSwap3",
+                                                "type": "SetVariable",
+                                                "dependsOn": [
+                                                    {
+                                                        "activity": "Insert into queue",
+                                                        "dependencyConditions": [
+                                                            "Succeeded"
+                                                        ]
+                                                    }
+                                                ],
+                                                "userProperties": [],
+                                                "typeProperties": {
+                                                    "variableName": "Queue",
+                                                    "value": {
+                                                        "value": "@variables('_tmpQueue')",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "name": "Set CurrentFolderPath",
+                                                "type": "SetVariable",
+                                                "dependsOn": [],
+                                                "userProperties": [],
+                                                "typeProperties": {
+                                                    "variableName": "CurrentFolderPath",
+                                                    "value": {
+                                                        "value": "@variables('Queue')[0].name",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "defaultActivities": [
+                                    {
+                                        "name": "Append file path",
+                                        "type": "AppendVariable",
+                                        "dependsOn": [],
+                                        "userProperties": [],
+                                        "typeProperties": {
+                                            "variableName": "FilePaths",
+                                            "value": {
+                                                "value": "@{variables('CurrentFolderPath')}/@{variables('Queue')[0].name}",
+                                                "type": "Expression"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "Remove queue head",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "Process queue head",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "_tmpQueue",
+                                "value": {
+                                    "value": "@skip(variables('Queue'),1)",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "varSwap1",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "Remove queue head",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "Queue",
+                                "value": {
+                                    "value": "@variables('_tmpQueue')",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    ],
+                    "timeout": "7.00:00:00"
+                }
+            },
+            {
+                "name": "Inspect output",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "Until queue is empty",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "_tmpQueue",
+                    "value": {
+                        "value": "@variables('FilePaths')",
+                        "type": "Expression"
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "RootPath": {
+                "type": "string",
+                "defaultValue": "/Path/To/Root"
+            }
+        },
+        "variables": {
+            "CurrentFolderPath": {
+                "type": "String"
+            },
+            "Queue": {
+                "type": "Array"
+            },
+            "_tmpQueue": {
+                "type": "Array"
+            },
+            "FilePaths": {
+                "type": "Array"
+            }
+        },
+        "folder": {
+            "name": "tmp"
+        },
+        "annotations": []
+    }
+}
