@@ -1,19 +1,29 @@
 # Starter pipeline
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# https://richardswinbank.net/adf/testing_azure_data_factory_in_your_cicd_pipeline
 
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-2019'
 
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: VSTest@2
+  displayName: 'Run tests'
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\AdfTests.dll
+    searchFolder: 'adf-testing-series\vs\03-FunctionalTesting\tests\AdfTests\bin\Debug'
+    testRunTitle: 'AdfTestRun'
+    runSettingsFile: 'adf-testing-series\vs\tests.runsettings'
+  env:
+    AZURE_TENANT_ID: $(AzureTenantId)
+    AZURE_SUBSCRIPTION_ID: $(AzureSubscriptionId)
+    AZURE_CLIENT_ID: $(AzureClientId)
+    AZURE_CLIENT_SECRET: $(AzureClientSecret)
