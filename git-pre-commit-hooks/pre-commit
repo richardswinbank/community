@@ -1,0 +1,4 @@
+#!C:/Program\ Files/Git/usr/bin/sh.exe
+ 
+# sort tabular models consistently to avoid merge conflicts
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\HookScripts\Sort-TabularModel.ps1"
