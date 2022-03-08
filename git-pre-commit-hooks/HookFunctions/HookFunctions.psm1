@@ -120,3 +120,37 @@ Function ConvertTo-OrderedModel($ModelFile) {
     $output = $model | ConvertTo-Json -Depth 100 | Format-Json 
     $output | Out-File -FilePath $ModelFile -Encoding UTF8
 }
+
+Function ConvertTo-OrderedSqlProject($ProjectFile) {
+    $ErrorActionPreference = "Stop" 
+    Write-Host "Running ConvertTo-OrderedSqlProject() on $ProjectFile"
+    $doc = new-object System.Xml.XmlDocument
+    $xml = Get-Content $ProjectFile -Encoding UTF8
+    $doc.LoadXml($xml)
+
+    foreach($node in $doc.DocumentElement.ChildNodes) {
+      if($node.Name -eq "ItemGroup") {
+        ConvertTo-OrderedElement -Element $node -AttributeName "Include"
+      }
+    }
+
+    $doc.Save($ProjectFile)
+}
+
+Function ConvertTo-OrderedElement([System.Xml.XmlElement]$Element, [string]$AttributeName) {
+    $ErrorActionPreference = "Stop" 
+    $items = $Element.ChildNodes
+    $changed = $true
+    
+    # bubble sort the element's children by the specified attribute
+    while($changed) {
+        $changed = $false
+        for($i = $items.Count - 1; $i -gt 0; $i--) {
+            if($items[$i].Attributes[$AttributeName].Value -lt $items[$i-1].Attributes[$AttributeName].Value) {
+                $item = $Element.RemoveChild($items[$i])
+                $Element.InsertBefore($item, $items[$i-1]) | Out-Null
+                $changed = $true
+            }
+        }
+    }
+}

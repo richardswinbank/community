@@ -2,3 +2,6 @@
  
 # sort tabular models consistently to avoid merge conflicts
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\HookScripts\Sort-TabularModel.ps1"
+ 
+# sort SSDT projects alphabeticallly to avoid merge conflicts
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\HookScripts\Sort-SsdtProject.ps1"
