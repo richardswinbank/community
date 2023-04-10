@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+      - '*'
+  paths:
+    include:
+      - powerbi-pro-devex-series/01-FirstPipeline/ExecutiveSummary.pbix
+
+variables:
+  folderPath: $(System.DefaultWorkingDirectory)/powerbi-pro-devex-series/01-FirstPipeline
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: PowerShell@2
+  displayName: Publish Power BI report
+  inputs:      
+    targetType: filePath
+    filePath: $(folderPath)/Deploy-PbiReport.ps1
+    arguments: >
+      -ReportName "Executive Summary"
+      -WorkspaceName "AdventureWorks Reports"
+      -PbixFilePath "$(folderPath)/ExecutiveSummary.pbix"
+    failOnStderr: true
+  env:
+    AZURE_TENANT_ID: $(AzureTenantId)
+    AZURE_CLIENT_ID: $(AzureClientId)
+    AZURE_CLIENT_SECRET: $(AzureClientSecret)
