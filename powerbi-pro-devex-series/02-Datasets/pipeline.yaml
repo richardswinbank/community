@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - powerbi-pro-devex-series/02-Datasets/Model.bim
+
+variables:
+  folderPath: $(System.DefaultWorkingDirectory)/powerbi-pro-devex-series/02-Datasets
+
+pool:
+  vmImage: windows-latest
+
+steps:
+
+- task: PowerShell@2
+  displayName: Publish Power BI dataset
+  inputs:      
+    targetType: filePath
+    filePath: $(folderPath)/Deploy-PbiDataset.ps1
+    arguments: >
+      -DatasetName "AdventureWorksLT"
+      -WorkspaceName "Datasets"
+      -BimFilePath "$(folderPath)/Model.bim"
+      -RefreshDataset $true
+    failOnStderr: true
+  env:
+    AZURE_TENANT_ID: $(AzureTenantId)
+    AZURE_CLIENT_ID: $(AzureClientId)
+    AZURE_CLIENT_SECRET: $(AzureClientSecret)
