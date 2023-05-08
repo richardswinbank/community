@@ -1,0 +1,46 @@
+trigger:
+  branches:
+    include:
+      - rc/*
+      - main
+  paths:
+    include:
+      - powerbi-pro-devex-series/03-ReportEnvironments/ExecutiveSummary.pbix
+pr:
+  branches:
+    include:
+      - rc/*
+  paths:
+    include:
+      - powerbi-pro-devex-series/03-ReportEnvironments/ExecutiveSummary.pbix
+
+variables:
+- name: folderPath
+  value: $(System.DefaultWorkingDirectory)/powerbi-pro-devex-series/03-ReportEnvironments
+- name: workspaceName
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+    value: 'AdventureWorks Reports'
+  ${{ elseif eq(variables['Build.Reason'], 'PullRequest') }}:
+    value: 'AdventureWorks Reports [Test]'
+  ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/rc/') }}:
+    value: 'AdventureWorks Reports [UAT]'
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: PowerShell@2
+  displayName: Publish Power BI report
+  inputs:
+    targetType: filePath
+    filePath: $(folderPath)/Deploy-PbiReport.ps1
+    arguments: >
+      -ReportName "Executive Summary"
+      -WorkspaceName "$(workspaceName)"
+      -PbixFilePath "$(folderPath)/ExecutiveSummary.pbix"
+    failOnStderr: true
+  env:
+    AZURE_TENANT_ID: $(AzureTenantId)
+    AZURE_CLIENT_ID: $(AzureClientId)
+    AZURE_CLIENT_SECRET: $(AzureClientSecret)
+    PBI_WORKSPACE_ADMINS: $(PowerBiWorkspaceAdmins)
