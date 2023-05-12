@@ -42,8 +42,8 @@ if($result -like "*error*") {
 # refresh dataset
 if ($RefreshDataset) {
     $workspaceId = (Get-PowerBIWorkspace -Name $WorkspaceName).Id
-    $datasetId = (Get-PowerBIDataset -Name "$DatasetName" -WorkspaceId "$workspaceId").Id
-    $url = "/groups/$datasetId/datasets/$datasetId/refreshes" 
+    $datasetId = (Get-PowerBIDataset -WorkspaceId "$workspaceId" | Where-Object {$_.Name -eq "$DatasetName"}).Id
+    $url = "/groups/$workspaceId/datasets/$datasetId/refreshes"
     $body = @{notifyOption = "NoNotification"} | ConvertTo-Json -Compress
     Invoke-PowerBIRestMethod -Url $url -Method POST -Body $body | Out-Null
 }
