@@ -1,0 +1,6 @@
+variables:
+  reportName: 'Sales KPIs'
+  description: |
+    Key perfomance indicators for product sales.
+  workspaceName: 'AdventureWorks Reports'
+  isDeleted: false

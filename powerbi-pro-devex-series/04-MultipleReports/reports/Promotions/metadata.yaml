@@ -1,0 +1,9 @@
+variables:
+  reportName: 'Promotions'
+  description: |
+    Information about sales promotions including:
+      * Promotion details
+      * Seasonality & duration
+      * Performance
+  workspaceName: 'AdventureWorks Reports'
+  isDeleted: false

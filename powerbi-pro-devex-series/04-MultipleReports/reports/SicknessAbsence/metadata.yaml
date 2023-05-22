@@ -1,0 +1,6 @@
+variables:
+  reportName: 'Sickness & Other Absences'
+  description: |
+    Sickness and other people absences report for management.
+  workspaceName: 'Our People'
+  isDeleted: false

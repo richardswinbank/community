@@ -1,0 +1,41 @@
+parameters:
+- name: reportFolder
+  type: string
+
+stages:
+- stage: Jobs
+  variables:
+  - group: DeploymentSecrets
+  - template: ${{ parameters.reportFolder }}/metadata.yaml
+  jobs:
+
+  - job: Job
+    displayName: Publish Power BI report
+    pool:
+      vmImage: ubuntu-latest
+    variables:
+    - name: targetWorkspace
+      ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+        value: '$(workspaceName)'
+      ${{ elseif eq(variables['Build.Reason'], 'PullRequest') }}:
+        value: '$(workspaceName) [Test]'
+      ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/rc/') }}:
+        value: '$(workspaceName) [UAT]'
+    steps:
+
+    - task: PowerShell@2
+      displayName: Publish report
+      inputs:      
+        targetType: filePath
+        filePath: "$(System.DefaultWorkingDirectory)/${{ parameters.reportFolder }}/../../tools/Deploy-PbiReport.ps1"
+        arguments: >
+          -ReportName "$(reportName)"
+          -WorkspaceName "$(targetWorkspace)"
+          -PbixFilePath "$(System.DefaultWorkingDirectory)/${{ parameters.reportFolder }}/Report.pbix"
+          -IsDeleted $$(isDeleted)
+        failOnStderr: true
+      env:
+        AZURE_TENANT_ID: $(AzureTenantId)
+        AZURE_CLIENT_ID: $(AzureClientId)
+        AZURE_CLIENT_SECRET: $(AzureClientSecret)
+        PBI_WORKSPACE_ADMINS: $(PowerBiWorkspaceAdmins)

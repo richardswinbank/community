@@ -1,0 +1,6 @@
+variables:
+  reportName: 'Joiners & Leavers'
+  description: |
+    Staff turnover information.
+  workspaceName: 'Our People'
+  isDeleted: false

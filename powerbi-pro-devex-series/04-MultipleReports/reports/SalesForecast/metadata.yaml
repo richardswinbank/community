@@ -1,0 +1,6 @@
+variables:
+  reportName: 'Sales Forecast'
+  description: |
+    Forecasting sales performance for the next quarter.
+  workspaceName: 'AdventureWorks Reports'
+  isDeleted: false
