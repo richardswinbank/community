@@ -1,0 +1,4 @@
+variables:
+  datasetName: AdventureWorksLT
+  description: |
+    Sales data for the AdventureWorks company.

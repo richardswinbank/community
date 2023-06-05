@@ -1,0 +1,19 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - /powerbi-pro-devex-series/05-DatasetEnvironments/datasets/Customers
+pr:
+  branches:
+    include:
+      - rc/*
+  paths:
+    include:
+      - /powerbi-pro-devex-series/05-DatasetEnvironments/datasets/Customers
+
+stages:
+- template: ../../tools/dataset-pipeline-stages.yaml
+  parameters:
+    datasetFolder: /powerbi-pro-devex-series/05-DatasetEnvironments/datasets/Customers

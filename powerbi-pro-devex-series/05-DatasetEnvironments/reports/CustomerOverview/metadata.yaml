@@ -1,0 +1,7 @@
+variables:
+  reportName: 'Customer Overview'
+  description: |
+    What we know about our customers.
+  workspaceName: 'AdventureWorks Reports'
+  sourceDataset: CustomerData
+  isDeleted: false

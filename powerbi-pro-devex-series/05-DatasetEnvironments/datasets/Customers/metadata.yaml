@@ -1,0 +1,4 @@
+variables:
+  datasetName: CustomerData
+  description: |
+    Customer data.

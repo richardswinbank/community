@@ -1,0 +1,183 @@
+{
+	"name": "Model",
+	"compatibilityLevel": 1567,
+	"model": {
+		"culture": "en-GB",
+		"dataAccessOptions": {
+			"legacyRedirects": true,
+			"returnErrorValuesAsNull": true
+		},
+		"defaultPowerBIDataSourceVersion": "powerBI_V3",
+		"sourceQueryCulture": "en-GB",
+		"tables": [
+			{
+				"name": "Customer",
+				"columns": [
+					{
+						"name": "City",
+						"dataType": "string",
+						"sourceColumn": "City",
+						"summarizeBy": "none",
+						"annotations": [
+							{
+								"name": "SummarizationSetBy",
+								"value": "Automatic"
+							}
+						]
+					},
+					{
+						"name": "Company Name",
+						"dataType": "string",
+						"sourceColumn": "Company Name",
+						"summarizeBy": "none",
+						"annotations": [
+							{
+								"name": "SummarizationSetBy",
+								"value": "Automatic"
+							}
+						]
+					},
+					{
+						"name": "Country-Region",
+						"dataType": "string",
+						"sourceColumn": "Country-Region",
+						"summarizeBy": "none",
+						"annotations": [
+							{
+								"name": "SummarizationSetBy",
+								"value": "Automatic"
+							}
+						]
+					},
+					{
+						"name": "CustomerID",
+						"dataType": "int64",
+						"isHidden": true,
+						"sourceColumn": "CustomerID",
+						"formatString": "0",
+						"summarizeBy": "none",
+						"changedProperties": [
+							{
+								"property": "IsHidden"
+							}
+						],
+						"annotations": [
+							{
+								"name": "SummarizationSetBy",
+								"value": "User"
+							}
+						]
+					},
+					{
+						"name": "Postal Code",
+						"dataType": "string",
+						"sourceColumn": "Postal Code",
+						"summarizeBy": "none",
+						"annotations": [
+							{
+								"name": "SummarizationSetBy",
+								"value": "Automatic"
+							}
+						]
+					},
+					{
+						"name": "State-Province",
+						"dataType": "string",
+						"sourceColumn": "State-Province",
+						"summarizeBy": "none",
+						"annotations": [
+							{
+								"name": "SummarizationSetBy",
+								"value": "Automatic"
+							}
+						]
+					}
+				],
+				"partitions": [
+					{
+						"name": "Customer-90cc9a14-4de6-4c72-9d7e-aec8d36edc8e",
+						"mode": "import",
+						"source": {
+							"type": "m",
+							"expression": [
+								"let",
+								"    Source = Sql.Database(\"sql-powerbiprodev.database.windows.net\", \"AdventureWorks\", [Query=\"SELECT TOP 1 WITH TIES c.[CustomerID], c.[CompanyName], a.CountryRegion, a.StateProvince, a.City, a.PostalCode FROM [SalesLT].[Customer] c    INNER JOIN SalesLT.CustomerAddress ca ON ca.CustomerID = c.CustomerID    INNER JOIN SalesLT.Address a ON a.AddressID = ca.AddressID ORDER BY ROW_NUMBER() OVER (PARTITION BY c.[CustomerID]    ORDER BY ca.ModifiedDate DESC)\"]),",
+								"    #\"Renamed Columns\" = Table.RenameColumns(Source,{{\"CompanyName\", \"Company Name\"}, {\"CountryRegion\", \"Country-Region\"}, {\"PostalCode\", \"Postal Code\"}, {\"StateProvince\", \"State-Province\"}})",
+								"in",
+								"    #\"Renamed Columns\""
+							]
+						}
+					}
+				],
+				"hierarchies": [
+					{
+						"name": "Geography",
+						"levels": [
+							{
+								"name": "Country-Region",
+								"ordinal": 0,
+								"column": "Country-Region"
+							},
+							{
+								"name": "State-Province",
+								"ordinal": 1,
+								"column": "State-Province"
+							},
+							{
+								"name": "City",
+								"ordinal": 2,
+								"column": "City"
+							},
+							{
+								"name": "Postal Code",
+								"ordinal": 3,
+								"column": "Postal Code"
+							}
+						]
+					}
+				],
+				"annotations": [
+					{
+						"name": "PBI_ResultType",
+						"value": "Table"
+					},
+					{
+						"name": "PBI_NavigationStepName",
+						"value": "Navigation"
+					}
+				]
+			}
+		],
+		"cultures": [
+			{
+				"name": "en-GB",
+				"linguisticMetadata": {
+					"content": {
+						"Version": "1.0.0",
+						"Language": "en-US",
+						"DynamicImprovement": "HighConfidence"
+					},
+					"contentType": "json"
+				}
+			}
+		],
+		"annotations": [
+			{
+				"name": "__PBI_TimeIntelligenceEnabled",
+				"value": "1"
+			},
+			{
+				"name": "PBI_QueryOrder",
+				"value": "[\"Customer\",\"Sales\",\"Product\",\"Date\"]"
+			},
+			{
+				"name": "PBIDesktopVersion",
+				"value": "2.115.842.0"
+			},
+			{
+				"name": "TabularEditor_SerializeOptions",
+				"value": "{\"IgnoreInferredObjects\":true,\"IgnoreInferredProperties\":true,\"IgnoreTimestamps\":true,\"SplitMultilineStrings\":true,\"PrefixFilenames\":false,\"LocalTranslations\":false,\"LocalPerspectives\":false,\"LocalRelationships\":false,\"Levels\":[\"Data Sources\",\"Shared Expressions\",\"Perspectives\",\"Relationships\",\"Roles\",\"Tables\",\"Tables/Columns\",\"Tables/Hierarchies\",\"Tables/Measures\",\"Tables/Partitions\",\"Tables/Calculation Items\",\"Translations\"]}"
+			}
+		]
+	}
+}

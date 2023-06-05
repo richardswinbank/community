@@ -1,0 +1,697 @@
+{
+  "name": "Model",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-GB",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-GB",
+    "tables": [
+      {
+        "name": "Customer",
+        "columns": [
+          {
+            "name": "City",
+            "dataType": "string",
+            "sourceColumn": "City",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Company Name",
+            "dataType": "string",
+            "sourceColumn": "Company Name",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Country-Region",
+            "dataType": "string",
+            "sourceColumn": "Country-Region",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "CustomerID",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "CustomerID",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ]
+          },
+          {
+            "name": "Postal Code",
+            "dataType": "string",
+            "sourceColumn": "Postal Code",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "State-Province",
+            "dataType": "string",
+            "sourceColumn": "State-Province",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Customer-90cc9a14-4de6-4c72-9d7e-aec8d36edc8e",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"sql-powerbiprodev.database.windows.net\", \"AdventureWorks\", [Query=\"SELECT TOP 1 WITH TIES c.[CustomerID], c.[CompanyName], a.CountryRegion, a.StateProvince, a.City, a.PostalCode FROM [SalesLT].[Customer] c    INNER JOIN SalesLT.CustomerAddress ca ON ca.CustomerID = c.CustomerID    INNER JOIN SalesLT.Address a ON a.AddressID = ca.AddressID ORDER BY ROW_NUMBER() OVER (PARTITION BY c.[CustomerID]    ORDER BY ca.ModifiedDate DESC)\"]),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(Source,{{\"CompanyName\", \"Company Name\"}, {\"CountryRegion\", \"Country-Region\"}, {\"PostalCode\", \"Postal Code\"}, {\"StateProvince\", \"State-Province\"}})",
+                "in",
+                "    #\"Renamed Columns\""
+              ]
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Geography",
+            "levels": [
+              {
+                "name": "Country-Region",
+                "ordinal": 0,
+                "column": "Country-Region"
+              },
+              {
+                "name": "State-Province",
+                "ordinal": 1,
+                "column": "State-Province"
+              },
+              {
+                "name": "City",
+                "ordinal": 2,
+                "column": "City"
+              },
+              {
+                "name": "Postal Code",
+                "ordinal": 3,
+                "column": "Postal Code"
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          }
+        ]
+      },
+      {
+        "name": "Date",
+        "columns": [
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "formatString": "General Date",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Day of week",
+            "dataType": "string",
+            "sourceColumn": "Day of week",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Month",
+            "dataType": "string",
+            "sourceColumn": "Month",
+            "sortByColumn": "MonthOrder",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "MonthOrder",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "MonthOrder",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ]
+          },
+          {
+            "name": "Quarter",
+            "dataType": "string",
+            "sourceColumn": "Quarter",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Date-77793f3b-a348-43f6-887c-adb78b324f53",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"sql-powerbiprodev.database.windows.net\", \"AdventureWorks\", [Query=\"WITH cte AS (#(lf)    SELECT TOP 366#(lf)    CAST(DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY [object_id]), '2007-12-31') AS DATE) AS [Date]#(lf)    FROM sys.columns#(lf))#(lf) SELECT #(lf)  [Date]#(lf), DayName = DATENAME(dw, [Date])#(lf), [MonthName] = DATENAME(mm, [Date])#(lf), [MonthOrder] = MONTH([Date])#(lf), [Quarter] = 'Q' + CAST(DATEPART(q, [Date]) AS VARCHAR) + ' ' + CAST(YEAR([Date]) AS VARCHAR)#(lf), [Year] = YEAR([Date])#(lf)FROM cte\"]),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(Source,{{\"DayName\", \"Day of week\"}, {\"MonthName\", \"Month\"}})",
+                "in",
+                "    #\"Renamed Columns\""
+              ]
+            }
+          }
+        ],
+        "changedProperties": [
+          {
+            "property": "Name"
+          }
+        ],
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ]
+      },
+      {
+        "name": "Product",
+        "description": "Product details",
+        "columns": [
+          {
+            "name": "Color",
+            "dataType": "string",
+            "sourceColumn": "Color",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Product Category",
+            "dataType": "string",
+            "sourceColumn": "Product Category",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Product Name",
+            "dataType": "string",
+            "sourceColumn": "Product Name",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Product Number",
+            "dataType": "string",
+            "sourceColumn": "Product Number",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Product Subcategory",
+            "dataType": "string",
+            "sourceColumn": "Product Subcategory",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "ProductID",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ProductID",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Size",
+            "dataType": "string",
+            "sourceColumn": "Size",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Weight",
+            "dataType": "double",
+            "sourceColumn": "Weight",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Product-83b6a2db-bbc3-4f03-8066-a64fff2f1a80",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"sql-powerbiprodev.database.windows.net\", \"AdventureWorks\", [Query=\"SELECT#(lf)       p.[ProductID]#(lf)      ,p.[ProductNumber]#(lf)      ,m.Name AS ProductName#(lf)      , sc.Name AS ProductSubcategory#(lf)      , c.Name AS ProductCategory#(lf)      ,p.[Color]#(lf)      ,p.[Size]#(lf)      ,p.[Weight]#(lf)FROM [SalesLT].[Product] p#(lf)  LEFT JOIN [SalesLT].[ProductModel] m ON m.ProductModelID = p.ProductModelID#(lf)  LEFT JOIN SalesLT.ProductCategory sc ON sc.ProductCategoryID = p.ProductCategoryID#(lf)  LEFT JOIN SalesLT.ProductCategory c ON c.ProductCategoryID = sc.ParentProductCategoryID#(lf)  \"]),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(Source,{{\"ProductCategory\", \"Product Category\"}, {\"ProductName\", \"Product Name\"}, {\"ProductNumber\", \"Product Number\"}, {\"ProductSubcategory\", \"Product Subcategory\"}})",
+                "in",
+                "    #\"Renamed Columns\""
+              ]
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Product Breakdown",
+            "levels": [
+              {
+                "name": "Product Category",
+                "ordinal": 0,
+                "column": "Product Category"
+              },
+              {
+                "name": "Product Subcategory",
+                "ordinal": 1,
+                "column": "Product Subcategory"
+              },
+              {
+                "name": "Product Name",
+                "ordinal": 2,
+                "column": "Product Name"
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ]
+      },
+      {
+        "name": "Sales",
+        "description": "Sales measures",
+        "columns": [
+          {
+            "name": "Amount",
+            "dataType": "double",
+            "sourceColumn": "Amount",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ]
+          },
+          {
+            "name": "Channel",
+            "dataType": "string",
+            "sourceColumn": "Channel",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "CustomerID",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "CustomerID",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ]
+          },
+          {
+            "name": "Due Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Due Date",
+            "formatString": "General Date",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Number of Items",
+            "dataType": "int64",
+            "sourceColumn": "Number of Items",
+            "formatString": "0",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Order Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Order Date",
+            "formatString": "General Date",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "ProductID",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ProductID",
+            "formatString": "0",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ]
+          },
+          {
+            "name": "Unit Price",
+            "dataType": "double",
+            "isHidden": true,
+            "sourceColumn": "Unit Price",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ]
+          },
+          {
+            "name": "Unit Price Discount",
+            "dataType": "double",
+            "isHidden": true,
+            "sourceColumn": "Unit Price Discount",
+            "formatString": "0.0%;-0.0%;0.0%",
+            "summarizeBy": "none",
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Sales-e07b8a6f-bcc3-4a1e-b157-f8f3b98a9e1b",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"sql-powerbiprodev.database.windows.net\", \"AdventureWorks\", [Query=\"SELECT#(lf)  d.[SalesOrderID]#(lf), h.CustomerID#(lf), d.[ProductID]#(lf), d.[OrderQty]#(lf), d.[UnitPrice]#(lf), d.[UnitPriceDiscount]#(lf), d.[LineTotal]#(lf), h.OrderDate#(lf), h.ShipDate#(lf), h.DueDate#(lf), IIF(h.OnlineOrderFlag = 1, 'Online', 'In store') AS Channel#(lf)FROM [SalesLT].[SalesOrderDetail] d#(lf)  INNER JOIN SalesLT.SalesOrderHeader h ON h.SalesOrderID = d.SalesOrderID\"]),",
+                "    #\"Removed Columns\" = Table.RemoveColumns(Source,{\"SalesOrderID\"}),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(#\"Removed Columns\",{{\"LineTotal\", \"Amount\"}}),",
+                "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Renamed Columns\",{\"ShipDate\"}),",
+                "    #\"Renamed Columns1\" = Table.RenameColumns(#\"Removed Columns1\",{{\"DueDate\", \"Due Date\"}, {\"OrderDate\", \"Order Date\"}, {\"OrderQty\", \"Number of Items\"}, {\"UnitPrice\", \"Unit Price\"}, {\"UnitPriceDiscount\", \"Unit Price Discount\"}})",
+                "in",
+                "    #\"Renamed Columns1\""
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Amount by Due Date",
+            "description": "Sales amount broken down by payment due date.",
+            "expression": [
+              "CALCULATE(",
+              "  SUM(Sales[Amount])",
+              ", USERELATIONSHIP(",
+              "    Sales[Due Date]",
+              "  ,'Date'[Date]",
+              "  )",
+              ")"
+            ],
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ]
+          },
+          {
+            "name": "Average cost per item",
+            "expression": "DIVIDE(SUM('Sales'[Amount]), SUM('Sales'[Number of Items]))",
+            "lineageTag": "4575000f-7123-4b8d-b8c3-e8ed65c79200"
+          }
+        ],
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "8f1f206f-10fe-4fc2-ac72-a84aad8fdb8a",
+        "fromTable": "Sales",
+        "fromColumn": "Due Date",
+        "toTable": "Date",
+        "toColumn": "Date",
+        "isActive": false
+      },
+      {
+        "name": "c2b9501a-cf66-49b7-ac39-0e865ba69fd7",
+        "fromTable": "Sales",
+        "fromColumn": "ProductID",
+        "toTable": "Product",
+        "toColumn": "ProductID"
+      },
+      {
+        "name": "ca2d9324-ebad-4031-b854-659a92e439ab",
+        "fromTable": "Sales",
+        "fromColumn": "Order Date",
+        "toTable": "Date",
+        "toColumn": "Date"
+      },
+      {
+        "name": "fe0b9766-3d54-453e-97a7-c51349d71f2b",
+        "fromTable": "Sales",
+        "fromColumn": "CustomerID",
+        "toTable": "Customer",
+        "toColumn": "CustomerID"
+      }
+    ],
+    "cultures": [
+      {
+        "name": "en-GB",
+        "linguisticMetadata": {
+          "content": {
+            "Version": "1.0.0",
+            "Language": "en-US",
+            "DynamicImprovement": "HighConfidence"
+          },
+          "contentType": "json"
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "1"
+      },
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"Customer\",\"Sales\",\"Product\",\"Date\"]"
+      },
+      {
+        "name": "PBIDesktopVersion",
+        "value": "2.115.842.0"
+      },
+      {
+        "name": "TabularEditor_SerializeOptions",
+        "value": "{\"IgnoreInferredObjects\":true,\"IgnoreInferredProperties\":true,\"IgnoreTimestamps\":true,\"SplitMultilineStrings\":true,\"PrefixFilenames\":false,\"LocalTranslations\":false,\"LocalPerspectives\":false,\"LocalRelationships\":false,\"Levels\":[\"Data Sources\",\"Shared Expressions\",\"Perspectives\",\"Relationships\",\"Roles\",\"Tables\",\"Tables/Columns\",\"Tables/Hierarchies\",\"Tables/Measures\",\"Tables/Partitions\",\"Tables/Calculation Items\",\"Translations\"]}"
+      }
+    ]
+  }
+}
