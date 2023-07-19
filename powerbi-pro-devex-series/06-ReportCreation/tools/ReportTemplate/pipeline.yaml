@@ -1,0 +1,20 @@
+trigger:
+  branches:
+    include:
+      - rc/*
+      - main
+  paths:
+    include:
+      - /powerbi-pro-devex-series/06-ReportCreation/reports/_ReportTemplate_
+pr:
+  branches:
+    include:
+      - rc/*
+  paths:
+    include:
+      - /powerbi-pro-devex-series/06-ReportCreation/reports/_ReportTemplate_
+
+stages:
+- template: ../../tools/report-pipeline-stages.yaml
+  parameters:
+    reportFolder: /powerbi-pro-devex-series/06-ReportCreation/reports/_ReportTemplate_

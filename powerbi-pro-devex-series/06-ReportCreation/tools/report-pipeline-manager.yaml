@@ -1,0 +1,36 @@
+trigger:
+  branches:
+    include:
+    - '*'
+    exclude:
+    - main
+    - rc/*
+  paths:
+    include:
+    - /powerbi-pro-devex-series/06-ReportCreation/reports
+pr: none
+
+variables:
+- group: DeploymentSecrets
+- name: folderPath
+  value: $(System.DefaultWorkingDirectory)/powerbi-pro-devex-series/06-ReportCreation
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: PowerShell@2
+  displayName: Manage report pipelines
+  inputs:
+    targetType: filePath
+    filePath: $(folderPath)/tools/Sync-AzureDevOps.ps1
+    arguments: >
+      -AzureDevOpsOrganization "https://dev.azure.com/richardswinbank"
+      -AzureDevOpsProject "PowerBiProDev"
+      -RepositoryLocalPath "$(Build.Repository.LocalPath)"
+      -BranchName "$(Build.SourceBranchName)"
+    failOnStderr: true
+  env:
+    AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+    AZURE_DEVOPS_EXT_GITHUB_PAT: $(GitHubPersonalAccessToken)
+    GITHUB_SERVICE_CONNECTION_ID: $(GitHubServiceConnectionId)

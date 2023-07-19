@@ -1,0 +1,7 @@
+variables:
+  reportName: '_ReportTemplate_'
+  description: |
+    Describe _ReportTemplate_ here.
+  workspaceName: 'AdventureWorks reports'
+  sourceDataset: AdventureWorksLT
+  isDeleted: false

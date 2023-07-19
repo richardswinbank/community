@@ -1,0 +1,38 @@
+parameters:
+- name: datasetFolder
+  type: string
+
+stages:
+- stage: Jobs
+  variables:
+  - group: DeploymentSecrets
+  - template: ${{ parameters.datasetFolder }}/metadata.yaml
+  jobs:
+ 
+  - job: Job
+    displayName: Publish Power BI dataset
+    pool:
+      vmImage: windows-latest
+    variables:
+    - name: targetWorkspace
+      ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+        value: 'Datasets'
+      ${{ elseif eq(variables['Build.Reason'], 'PullRequest') }}:
+        value: 'Datasets [Test]'
+    steps:
+
+    - task: PowerShell@2
+      displayName: Publish dataset
+      inputs:      
+        targetType: filePath
+        filePath: "$(System.DefaultWorkingDirectory)/${{ parameters.datasetFolder }}/../../tools/Deploy-PbiDataset.ps1"
+        arguments: >
+          -DatasetName "$(datasetName)"
+          -WorkspaceName "$(targetWorkspace)"
+          -BimFilePath "$(System.DefaultWorkingDirectory)/${{ parameters.datasetFolder }}/Model.bim"
+          -RefreshDataset $true
+        failOnStderr: true
+      env:
+        AZURE_TENANT_ID: $(AzureTenantId)
+        AZURE_CLIENT_ID: $(AzureClientId)
+        AZURE_CLIENT_SECRET: $(AzureClientSecret)
