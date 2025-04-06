@@ -1,0 +1,7 @@
+variables:
+  reportName: 'Executive Summary'
+  description: |
+    A summary of company sales performance for executives.
+  workspaceName: 'AdventureWorks Reports'
+  sourceDataset: AdventureWorksLT
+  isDeleted: false

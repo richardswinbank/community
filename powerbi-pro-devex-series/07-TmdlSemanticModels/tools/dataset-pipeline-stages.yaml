@@ -1,0 +1,53 @@
+parameters:
+- name: datasetFolder
+  type: string
+
+stages:
+- stage: Jobs
+  variables:
+  - group: DeploymentSecrets
+  - template: ${{ parameters.datasetFolder }}/metadata.yaml
+  jobs:
+ 
+  - job: Job
+    displayName: Publish Power BI dataset
+    pool:
+      vmImage: windows-latest
+    variables:
+    - name: targetWorkspace
+      ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+        value: 'Datasets'
+      ${{ elseif eq(variables['Build.Reason'], 'PullRequest') }}:
+        value: 'Datasets [Test]'
+    - name: tmdlFolderPath
+      value: $(System.DefaultWorkingDirectory)/${{ parameters.datasetFolder }}
+    - name: bimFilePath
+      value: $(tmdlFolderPath)/Model.bim
+    steps:
+
+    - task: PowerShell@2
+      displayName: Generate BIM file
+      inputs:      
+        targetType: filePath
+        filePath: "$(System.DefaultWorkingDirectory)/${{ parameters.datasetFolder }}/../../tools/ConvertTo-Tmsl.ps1"
+        arguments: >
+          -TmdlFolderPath "$(tmdlFolderPath)"
+          -BimFilePath "$(bimFilePath)"
+        failOnStderr: true
+        pwsh: true
+
+    - task: PowerShell@2
+      displayName: Publish dataset
+      inputs:      
+        targetType: filePath
+        filePath: "$(System.DefaultWorkingDirectory)/${{ parameters.datasetFolder }}/../../tools/Deploy-PbiDataset.ps1"
+        arguments: >
+          -DatasetName "$(datasetName)"
+          -WorkspaceName "$(targetWorkspace)"
+          -BimFilePath "$(bimFilePath)"
+          -RefreshDataset $true
+        failOnStderr: true
+      env:
+        AZURE_TENANT_ID: $(AzureTenantId)
+        AZURE_CLIENT_ID: $(AzureClientId)
+        AZURE_CLIENT_SECRET: $(AzureClientSecret)

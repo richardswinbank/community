@@ -1,0 +1,22 @@
+relationship 831d5ea1-37de-42f3-a259-5f3caef02d79
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Date.Date
+	toColumn: LocalDateTable_9175c97a-3506-4057-9719-68ffd5e4d049.Date
+
+relationship 8f1f206f-10fe-4fc2-ac72-a84aad8fdb8a
+	isActive: false
+	fromColumn: Sales.'Due Date'
+	toColumn: Date.Date
+
+relationship c2b9501a-cf66-49b7-ac39-0e865ba69fd7
+	fromColumn: Sales.ProductID
+	toColumn: Product.ProductID
+
+relationship ca2d9324-ebad-4031-b854-659a92e439ab
+	fromColumn: Sales.'Order Date'
+	toColumn: Date.Date
+
+relationship fe0b9766-3d54-453e-97a7-c51349d71f2b
+	fromColumn: Sales.CustomerID
+	toColumn: Customer.CustomerID
+

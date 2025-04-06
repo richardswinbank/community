@@ -1,0 +1,87 @@
+/// Product details
+table Product
+
+	column Color
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Category'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Number'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Subcategory'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductID
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Size
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Size
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weight
+		dataType: double
+		summarizeBy: none
+		sourceColumn: Weight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	hierarchy 'Product Breakdown'
+
+		level 'Product Category'
+			column: 'Product Category'
+
+		level 'Product Subcategory'
+			column: 'Product Subcategory'
+
+		level 'Product Name'
+			column: 'Product Name'
+
+	partition Product-83b6a2db-bbc3-4f03-8066-a64fff2f1a80 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sql-powerbiprodev.database.windows.net", "AdventureWorks", [Query="SELECT#(lf)       p.[ProductID]#(lf)      ,p.[ProductNumber]#(lf)      ,m.Name AS ProductName#(lf)      , sc.Name AS ProductSubcategory#(lf)      , c.Name AS ProductCategory#(lf)      ,p.[Color]#(lf)      ,p.[Size]#(lf)      ,p.[Weight]#(lf)FROM [SalesLT].[Product] p#(lf)  LEFT JOIN [SalesLT].[ProductModel] m ON m.ProductModelID = p.ProductModelID#(lf)  LEFT JOIN SalesLT.ProductCategory sc ON sc.ProductCategoryID = p.ProductCategoryID#(lf)  LEFT JOIN SalesLT.ProductCategory c ON c.ProductCategoryID = sc.ParentProductCategoryID#(lf)  "]),
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"ProductCategory", "Product Category"}, {"ProductName", "Product Name"}, {"ProductNumber", "Product Number"}, {"ProductSubcategory", "Product Subcategory"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

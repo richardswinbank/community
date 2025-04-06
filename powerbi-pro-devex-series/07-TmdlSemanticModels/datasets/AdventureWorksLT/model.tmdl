@@ -1,0 +1,27 @@
+model Model
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Customer","Sales","Product","Date"]
+
+annotation PBIDesktopVersion = 2.115.842.0
+
+annotation TabularEditor_SerializeOptions = {"IgnoreInferredObjects":true,"IgnoreInferredProperties":true,"IgnoreTimestamps":true,"SplitMultilineStrings":true,"PrefixFilenames":false,"LocalTranslations":false,"LocalPerspectives":false,"LocalRelationships":false,"Levels":["Data Sources","Perspectives","Relationships","Roles","Shared Expressions","Tables","Tables/Calculation Items","Tables/Columns","Tables/Hierarchies","Tables/Measures","Tables/Partitions","Translations"]}
+
+annotation __TEdtr = 1
+
+ref table Customer
+ref table Date
+ref table DateTableTemplate_d067ad6c-e446-4687-bbbb-959be601b5b2
+ref table LocalDateTable_9175c97a-3506-4057-9719-68ffd5e4d049
+ref table Product
+ref table Sales
+
+ref cultureInfo en-GB
+

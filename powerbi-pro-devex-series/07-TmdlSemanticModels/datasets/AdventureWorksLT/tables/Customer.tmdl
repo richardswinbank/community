@@ -1,0 +1,75 @@
+table Customer
+
+	column City
+		dataType: string
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Company Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Company Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country-Region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Country-Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = User
+
+	column 'Postal Code'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column State-Province
+		dataType: string
+		summarizeBy: none
+		sourceColumn: State-Province
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Geography
+
+		level Country-Region
+			column: Country-Region
+
+		level State-Province
+			column: State-Province
+
+		level City
+			column: City
+
+		level 'Postal Code'
+			column: 'Postal Code'
+
+	partition Customer-90cc9a14-4de6-4c72-9d7e-aec8d36edc8e = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sql-powerbiprodev.database.windows.net", "AdventureWorks", [Query="SELECT TOP 1 WITH TIES c.[CustomerID], c.[CompanyName], a.CountryRegion, a.StateProvince, a.City, a.PostalCode FROM [SalesLT].[Customer] c    INNER JOIN SalesLT.CustomerAddress ca ON ca.CustomerID = c.CustomerID    INNER JOIN SalesLT.Address a ON a.AddressID = ca.AddressID ORDER BY ROW_NUMBER() OVER (PARTITION BY c.[CustomerID]    ORDER BY ca.ModifiedDate DESC)"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"CompanyName", "Company Name"}, {"CountryRegion", "Country-Region"}, {"PostalCode", "Postal Code"}, {"StateProvince", "State-Province"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,107 @@
+table DateTableTemplate_d067ad6c-e446-4687-bbbb-959be601b5b2
+	isHidden
+	isPrivate
+
+	column Date
+		dataType: dateTime
+		isHidden
+		dataCategory: PaddedDateTableDates
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = User
+
+	column Day = DAY([Date])
+		dataType: int64
+		isHidden
+		dataCategory: DayOfMonth
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Day
+
+	column Month = FORMAT([Date], "MMMM")
+		dataType: string
+		isHidden
+		dataCategory: Months
+		summarizeBy: none
+		isDataTypeInferred
+		sortByColumn: MonthNo
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Month
+
+	column MonthNo = MONTH([Date])
+		dataType: int64
+		isHidden
+		dataCategory: MonthOfYear
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = MonthNumber
+
+	column Quarter = "Qtr " & [QuarterNo]
+		dataType: string
+		isHidden
+		dataCategory: Quarters
+		summarizeBy: none
+		isDataTypeInferred
+		sortByColumn: QuarterNo
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Quarter
+
+	column QuarterNo = INT(([MonthNo] + 2) / 3)
+		dataType: int64
+		isHidden
+		dataCategory: QuarterOfYear
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = QuarterNumber
+
+	column Year = YEAR([Date])
+		dataType: int64
+		isHidden
+		dataCategory: Years
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = User
+
+		annotation TemplateId = Year
+
+	hierarchy 'Date Hierarchy'
+
+		level Year
+			column: Year
+
+		level Quarter
+			column: Quarter
+
+		level Month
+			column: Month
+
+		level Day
+			column: Day
+
+		annotation TemplateId = DateHierarchy
+
+	partition DateTableTemplate_d067ad6c-e446-4687-bbbb-959be601b5b2-7195daec-db52-435a-8645-2caf9f72de5d = calculated
+		mode: import
+		source = Calendar(Date(2015,1,1), Date(2015,1,1))
+
+	annotation __PBI_TemplateDateTable = true
+
+	annotation DefaultItem = DateHierarchy
+

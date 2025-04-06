@@ -1,0 +1,71 @@
+table Date
+
+	column Date
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: 831d5ea1-37de-42f3-a259-5f3caef02d79
+			defaultHierarchy: LocalDateTable_9175c97a-3506-4057-9719-68ffd5e4d049.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of week'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Day of week
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: MonthOrder
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthOrder
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: MonthOrder
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = User
+
+	column Quarter
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = User
+
+	partition Date-77793f3b-a348-43f6-887c-adb78b324f53 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sql-powerbiprodev.database.windows.net", "AdventureWorks", [Query="WITH cte AS (#(lf)    SELECT TOP 366#(lf)    CAST(DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY [object_id]), '2007-12-31') AS DATE) AS [Date]#(lf)    FROM sys.columns#(lf))#(lf) SELECT #(lf)  [Date]#(lf), DayName = DATENAME(dw, [Date])#(lf), [MonthName] = DATENAME(mm, [Date])#(lf), [MonthOrder] = MONTH([Date])#(lf), [Quarter] = 'Q' + CAST(DATEPART(q, [Date]) AS VARCHAR) + ' ' + CAST(YEAR([Date]) AS VARCHAR)#(lf), [Year] = YEAR([Date])#(lf)FROM cte"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"DayName", "Day of week"}, {"MonthName", "Month"}})
+				in
+				    #"Renamed Columns"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
